@@ -10,6 +10,9 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "nuxt": "^3.12.2"
+    "nuxt": "^3.12.2",
+    "pocketbase": "^0.21.3",
+    "short-unique-id": "^5.2.0",
+    "valibot": "^0.35.0"
   }
 }
