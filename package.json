@@ -15,5 +15,6 @@
     "pocketbase": "^0.21.3",
     "short-unique-id": "^5.2.0",
     "valibot": "^0.35.0"
-  }
+  },
+  "packageManager": "pnpm@9.3.0"
 }
