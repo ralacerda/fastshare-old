@@ -15,4 +15,10 @@ export default defineNuxtConfig({
       ],
     },
   },
+  runtimeConfig: {
+    public: {
+      hostURL: "http://localhost:3000",
+      pbURL: "http://127.0.0.1:8090",
+    },
+  },
 });

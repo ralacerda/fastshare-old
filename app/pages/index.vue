@@ -1,13 +1,25 @@
 <script setup lang="ts">
 import * as v from "valibot";
 import ShortUniqueId from "short-unique-id";
+import { useClipboard } from "@vueuse/core";
 
+const runtimeConfig = useRuntimeConfig();
+const pb = usePb();
 // Create login schema with email and password
 const UrlSchema = v.pipe(v.string(), v.url());
 
 const url = ref("");
 const validUrl = ref(true);
-const shortenLink = ref("");
+
+const shortenID = ref("");
+const shortenLink = computed(() => {
+  return shortenID.value
+    ? runtimeConfig.public.hostURL + "/" + shortenID.value
+    : "";
+});
+
+const { copy } = useClipboard();
+
 const uid = new ShortUniqueId({
   dictionary: "ABCDEFGHIJKLMNPQRSTUVWXYZ123456789".split(""),
 });
@@ -20,7 +32,11 @@ function validateUrl() {
 
 function submit() {
   if (!validateUrl()) return;
-  shortenLink.value = uid.fmt("$r3-$r3");
+  shortenID.value = uid.fmt("$r3-$r3");
+  pb.collection("links").create({
+    shortID: shortenID.value,
+    link: url.value,
+  });
 }
 </script>
 
@@ -45,10 +61,12 @@ function submit() {
           </div>
           <small v-if="!validUrl" class="has-text-danger">Invalid url</small>
         </form>
-        <div class="shorten-link">
+        <div class="shorten-link" v-if="shortenLink">
           <div>Link shortened:</div>
-          <div>{{ shortenLink }}</div>
-          <button class="button is-link">Copy</button>
+          <NuxtLink :to="shortenLink">{{ shortenLink }}</NuxtLink>
+          <button class="button is-link" @click="copy(shortenLink)">
+            Copy
+          </button>
         </div>
       </div>
     </div>
