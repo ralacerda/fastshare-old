@@ -2,12 +2,12 @@
 const route = useRoute();
 const pb = usePb();
 
-const url = route.params.link as string;
+const shortID = route.params.shortID as string;
 
-const { data, error, status } = await useAsyncData(url, async () => {
+const { data, error } = await useAsyncData(shortID, async () => {
   const record = await pb
     .collection("links")
-    .getFirstListItem(`shortID='${url}'`);
+    .getFirstListItem(`shortID='${shortID}'`);
   return { record };
 });
 
@@ -16,7 +16,7 @@ if (error.value) {
 }
 
 if (data.value?.record.link) {
-  navigateTo(data.value.record.link, { external: true });
+  navigateTo(data.value.record.link, { external: true, redirectCode: 302 });
 }
 </script>
 
