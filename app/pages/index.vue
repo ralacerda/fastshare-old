@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import * as v from "valibot";
-import ShortUniqueId from "short-unique-id";
 import { useClipboard } from "@vueuse/core";
 
 const runtimeConfig = useRuntimeConfig();
@@ -18,11 +17,9 @@ const shortenLink = computed(() => {
     : "";
 });
 
-const { copy } = useClipboard();
+const error = ref("");
 
-const uid = new ShortUniqueId({
-  dictionary: "ABCDEFGHIJKLMNPQRSTUVWXYZ123456789".split(""),
-});
+const { copy } = useClipboard();
 
 function validateUrl() {
   const err = v.safeParse(UrlSchema, url.value);
@@ -30,13 +27,20 @@ function validateUrl() {
   return err.success;
 }
 
-function submit() {
+async function submit() {
   if (!validateUrl()) return;
-  shortenID.value = uid.fmt("$r3-$r3");
-  pb.collection("links").create({
-    shortID: shortenID.value,
-    link: url.value,
+  error.value = "";
+  const { shortID } = await $fetch("/api/createLink", {
+    method: "POST",
+    body: {
+      url: url.value,
+    },
+    onResponseError: async ({ response }) => {
+      error.value = response._data.message;
+    },
   });
+
+  shortenID.value = shortID;
 }
 </script>
 
@@ -61,6 +65,7 @@ function submit() {
           </div>
           <small v-if="!validUrl" class="has-text-danger">Invalid url</small>
         </form>
+        <div v-if="error" class="has-text-danger">{{ error }}</div>
         <div class="shorten-link" v-if="shortenLink">
           <div>Link shortened:</div>
           <NuxtLink :to="shortenLink">{{ shortenLink }}</NuxtLink>

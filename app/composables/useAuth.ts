@@ -1,11 +1,10 @@
-import { pbKey } from "@@/plugins/pb";
 import type { AuthModel } from "pocketbase";
 
 const user = ref<AuthModel | null>(null);
 const loading = ref(true);
 
 export function useAuth() {
-  const pb = inject(pbKey);
+  const pb = usePb();
 
   async function login(emailOrUser: string, password: string) {
     if (!pb) {
